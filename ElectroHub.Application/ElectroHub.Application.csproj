@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ElectroHub.Domain\ElectroHub.Domain.csproj" />
-      <ProjectReference Include="..\ElectroHub.Infrastructure\ElectroHub.Infrastructure.csproj" />
+        <ProjectReference Include="..\ElectroHub.Domain\ElectroHub.Domain.csproj"/>
+        <ProjectReference Include="..\ElectroHub.Infrastructure\ElectroHub.Infrastructure.csproj"/>
     </ItemGroup>
 
 </Project>
