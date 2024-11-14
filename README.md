@@ -11,4 +11,4 @@ ElectroHub is a web app for reserving EV charging spots at various locations. Si
 
 ## Installation
   - **Fork the repository**: https://github.com/mk17b/ElectroHub
-  - **Install SQL Server** This project uses a SQL Server Database!
+  - **Install SQL Server**: This project uses a SQL Server Database!
