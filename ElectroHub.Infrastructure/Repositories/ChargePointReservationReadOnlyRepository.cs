@@ -31,14 +31,13 @@ public class ChargePointReservationReadOnlyRepository(string connectionString)
         return (await db.QueryAsync<ChargePointReservationDto>(queryString, new { UserId = userId })).ToList();
     }
 
-
     public async Task<List<ChargePointReservationDto>> GetChargePointsByDateAsync(DateTime? date)
     {
         var queryString = @"
         ;SELECT 
             NEWID() AS ChargePointReservationId, 
             NULL AS UserId, 
-            @Date AS Date, 
+            @Date AS ReservationDate, 
             c.SpotNumber AS SpotNumber
         FROM 
             [dbo].[ChargePoints] c

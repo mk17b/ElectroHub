@@ -1,0 +1,39 @@
+﻿<MudDialog ContentStyle="width: 550px;">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@DialogParameters.Icon" Class="mr-1 mb-n"/>
+            @DialogParameters.Title
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudStack>
+            <MudText Typo="Typo.body1" Style="font-size: 16px; font-weight: 400;">
+                @DialogParameters.Text
+            </MudText>
+        </MudStack>
+    </DialogContent>
+    <DialogActions>
+        <MudStack Row="true" Justify="Justify.FlexEnd" Class="pa-4">
+            <MudButton OnClick="OnCancel" Variant="Variant.Text">@DialogParameters.CancelButton</MudButton>
+            <MudButton OnClick="OnSubmit" Variant="Variant.Filled"
+                       Color="Color.Primary">@DialogParameters.SubmitButton</MudButton>
+        </MudStack>
+    </DialogActions>
+</MudDialog>
+
+@code{
+
+    [CascadingParameter] IMudDialogInstance MudDialogInstance { get; set; } = null!;
+    [Parameter] public DialogParameters DialogParameters { get; set; } = null!;
+
+    private void OnCancel()
+    {
+        MudDialogInstance.Cancel();
+    }
+
+    private void OnSubmit()
+    {
+        MudDialogInstance.Close(DialogResult.Ok(true));
+    }
+
+}

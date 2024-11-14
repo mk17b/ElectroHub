@@ -1,0 +1,152 @@
+﻿@page "/"
+@using global::ElectroHub.Application.ChargePoint
+@using global::ElectroHub.Domain.ChargePoint
+@using global::ElectroHub.Domain.Common.Enums
+@using global::ElectroHub.WebUI.Common.CommandsDto
+@using global::ElectroHub.WebUI.Common.Components
+@using global::ElectroHub.WebUI.Common.Services
+@using DialogParameters = global::ElectroHub.WebUI.Common.Components.DialogParameters
+
+@inject IDialogService DialogService
+@inject ISnackbarService SnackbarService
+@inject ChargePointService ChargePointService
+
+<PageTitle>ElectroHub</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Small">
+    <MudPaper Elevation="3" Class="px-16 py-8">
+        <MudStack Class="mb-4">
+            <MudText Typo="Typo.h4" GutterBottom="true" Style="font-weight: bold">ElectroHub</MudText>
+        </MudStack>
+        <MudStack Class="mb-8">
+            <MudText Typo="Typo.h6" GutterBottom="true" Style="font-weight: bold">My Reservations</MudText>
+            @if (UserReservations.Count == 0)
+            {
+                <MudText Typo="Typo.body2" Style="font-size: 15px;">Looks like you haven’t reserved a charge point
+                    yet!
+                </MudText>
+            }
+            @foreach (var chargePoint in UserReservations)
+            {
+                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                    <MudIcon Icon="@Icons.Material.Filled.ElectricBolt" Color="Color.Success"></MudIcon>
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.body2" Style="font-size: 15px; font-weight: bold">Reservation
+                            Date @chargePoint.ReservationDate.ToString("dd/MM/yyyy")</MudText>
+                        <MudText Typo="Typo.body2" Style="color: #696969;">@chargePoint.SpotNumber</MudText>
+                    </MudStack>
+                    <MudSpacer></MudSpacer>
+                    <MudIconButton OnClick="() => RemoveReservation(chargePoint)" Icon="@Icons.Material.Filled.Close"
+                                   Color="Color.Error"></MudIconButton>
+                </MudStack>
+                <MudDivider DividerType="DividerType.Middle"></MudDivider>
+            }
+        </MudStack>
+        <MudStack Class="mb-4">
+            <MudText Typo="Typo.h6" GutterBottom="true" Style="font-weight: bold">Available Charge Points</MudText>
+            <MudDatePicker DateChanged="OnDateChanged" DateFormat="dd/MM/yyyy" MinDate="@DateTime.Today"
+                           PickerVariant="PickerVariant.Dialog" ShowToolbar="false"
+                           Placeholder="Enter the reservation date" Color="Color.Primary" Class="mb-2"></MudDatePicker>
+            @foreach (var chargePoint in AvailableReservations)
+            {
+                <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                    <MudIcon Icon="@Icons.Material.Filled.ElectricBolt" Color="Color.Success"></MudIcon>
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.body2" Style="font-size: 15px; font-weight: bold">
+                            Available @chargePoint.ReservationDate.ToString("dd/MM/yyyy")</MudText>
+                        <MudText Typo="Typo.body2" Style="color: #696969;">@chargePoint.SpotNumber</MudText>
+                    </MudStack>
+                    <MudSpacer></MudSpacer>
+                    <MudButton OnClick="() => AddReservation(chargePoint)" Color="Color.Primary">Reserve</MudButton>
+                </MudStack>
+                <MudDivider DividerType="DividerType.Middle"></MudDivider>
+            }
+        </MudStack>
+    </MudPaper>
+</MudContainer>
+
+@code {
+
+    private Guid UserId { get; } = new("123e4567-e89b-12d3-a456-426614174000");
+    // private Guid UserId { get; } = new("c1b8f2e5-3a41-4ae5-9b8e-28d0b5946174");
+    private DateTime? _date = DateTime.Today;
+    private List<ChargePointReservationDto> UserReservations { get; set; } = new();
+    private List<ChargePointReservationDto> AvailableReservations { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadReservations();
+    }
+
+    private async Task LoadReservations()
+    {
+        UserReservations = await ChargePointService.InvokeAsync(new GetUserChargePointReservationsQuery(UserId));
+        AvailableReservations = await ChargePointService.InvokeAsync(new GetAvailableChargePointsByDateQuery(_date));
+    }
+
+    private async Task OnDateChanged(DateTime? newDate)
+    {
+        _date = newDate;
+        await LoadReservations();
+    }
+
+    public async Task AddReservation(ChargePointReservationDto chargePointReservation)
+    {
+        var dialogParameters = new DialogParameters
+        (
+            Icons.Material.Filled.EventAvailable,
+            "Charge Point Reservation",
+            "Are you sure you want to book this charge point?",
+            "Cancel",
+            "Reserve"
+        );
+
+        var parameters = new DialogParameters<Dialog> { { x => x.DialogParameters, dialogParameters } };
+        var options = new DialogOptions { MaxWidth = MaxWidth.Medium, Position = DialogPosition.Center, CloseOnEscapeKey = true };
+        var dialog = await DialogService.ShowAsync<Dialog>("Charge Point Reservation", parameters, options);
+
+        var result = await dialog.Result;
+
+        if (!result!.Canceled)
+        {
+            var command = new CreateChargePointReservationCommandDto { UserId = UserId, ReservationDate = chargePointReservation.ReservationDate, SpotNumber = chargePointReservation.SpotNumber }.ToCommand();
+            var reservationResult = await ChargePointService.InvokeAsync(command);
+
+            switch (reservationResult)
+            {
+                case ReservationStatus.Success:
+                    SnackbarService.ShowSuccessSnackbar(
+                        "Reservation for " + chargePointReservation.SpotNumber + " on "
+                        + chargePointReservation.ReservationDate.ToString("dd/MM/yyyy") + " has been created"
+                    );
+                    await LoadReservations();
+                    break;
+
+                case ReservationStatus.AlreadyReserved:
+                    SnackbarService.ShowInformationSnackbar(
+                        "You already have a reservation on "
+                        + chargePointReservation.ReservationDate.ToString("dd/MM/yyyy")
+                    );
+                    break;
+
+                case ReservationStatus.Error:
+                default:
+                    SnackbarService.ShowErrorSnackbar(
+                        "An error occurred while trying to reserve charge point "
+                        + chargePointReservation.SpotNumber + " on "
+                        + chargePointReservation.ReservationDate.ToString("dd/MM/yyyy") + ". Please try again."
+                    );
+                    break;
+            }
+        }
+    }
+
+    public async Task RemoveReservation(ChargePointReservationDto chargePointReservation)
+    {
+        var command = new DeleteChargePointReservationCommandDto { UserId = UserId, ReservationId = chargePointReservation.ChargePointReservationId, ReservationDate = chargePointReservation.ReservationDate }.ToCommand();
+        await ChargePointService.InvokeAsync(command);
+        SnackbarService.ShowErrorSnackbar("Reservation for " + chargePointReservation.SpotNumber + " on " + chargePointReservation.ReservationDate.ToString("dd/MM/yyyy") + " has been deleted");
+        await LoadReservations();
+    }
+
+}
