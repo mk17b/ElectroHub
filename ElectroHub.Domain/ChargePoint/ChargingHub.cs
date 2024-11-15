@@ -9,11 +9,13 @@ public class ChargingHub : EntityBase
     {
     }
 
-    public ChargingHub(Guid id, string address) : base(id)
+    public ChargingHub(Guid id, string name, string address) : base(id)
     {
+        Name = name;
         Address = address;
     }
 
+    public string Name { get; init; }
     public string Address { get; init; }
     public bool IsActive { get; init; }
     public virtual ICollection<ChargePoint> ChargePoints { get; set; }
