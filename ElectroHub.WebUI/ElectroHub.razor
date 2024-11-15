@@ -44,6 +44,12 @@
         </MudStack>
         <MudStack Class="mb-4">
             <MudText Typo="Typo.h6" GutterBottom="true" Style="font-weight: bold">Available Charge Points</MudText>
+            @if (AvailableReservations.Count == 0)
+            {
+                <MudText Typo="Typo.body2" Style="font-size: 15px;">Looks like there are no available spots at the 
+                    moment!
+                </MudText>
+            }
             <MudDatePicker DateChanged="OnDateChanged" DateFormat="dd/MM/yyyy" MinDate="@DateTime.Today"
                            PickerVariant="PickerVariant.Dialog" ShowToolbar="false"
                            Placeholder="Enter the reservation date" Color="Color.Primary" Class="mb-2"></MudDatePicker>
@@ -67,6 +73,7 @@
 
 @code {
 
+    private Guid ChargingHubId { get; } = new("5a32e9e2-6034-4cb5-a31a-9cfe094476f5");
     private Guid UserId { get; } = new("123e4567-e89b-12d3-a456-426614174000");
     // private Guid UserId { get; } = new("c1b8f2e5-3a41-4ae5-9b8e-28d0b5946174");
     private DateTime? _date = DateTime.Today;
@@ -109,7 +116,7 @@
 
         if (!result!.Canceled)
         {
-            var command = new CreateChargePointReservationCommandDto { UserId = UserId, ReservationDate = chargePointReservation.ReservationDate, SpotNumber = chargePointReservation.SpotNumber }.ToCommand();
+            var command = new CreateChargePointReservationCommandDto { ChargingHubId = ChargingHubId, UserId = UserId, ReservationDate = chargePointReservation.ReservationDate, SpotNumber = chargePointReservation.SpotNumber }.ToCommand();
             var reservationResult = await ChargePointService.InvokeAsync(command);
 
             switch (reservationResult)

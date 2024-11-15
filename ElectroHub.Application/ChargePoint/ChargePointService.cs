@@ -23,8 +23,8 @@ public class ChargePointService(
 
     public async Task<ReservationStatus> InvokeAsync(CreateChargePointReservationCommand command)
     {
-        var chargingHub = await chargingHubRepository.GetActiveAsync();
-        var result = chargingHub.TryReserve(command.UserId, command.ReservationDate, command.SpotNumber);
+        var chargingHub = await chargingHubRepository.GetByIdAsync(command.ChargingHubId);
+        var result = chargingHub!.TryReserve(command.UserId, command.ReservationDate, command.SpotNumber);
 
         if (result.Flag == ReservationStatus.Success)
             await chargingHubRepository.PersistAsync(chargingHub);

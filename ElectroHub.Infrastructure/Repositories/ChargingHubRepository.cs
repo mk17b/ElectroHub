@@ -8,9 +8,9 @@ namespace ElectroHub.Infrastructure.Repositories;
 public class ChargingHubRepository(ElectroHubDbContext electroHubDbContext)
     : RepositoryBase(electroHubDbContext), IChargingHubRepository
 {
-    public async Task<ChargingHub> GetActiveAsync()
+    public async Task<ChargingHub?> GetByIdAsync(Guid id)
     {
-        return await ElectroHubDbContext.ChargingHubs.SingleAsync(x => x.IsActive);
+        return await ElectroHubDbContext.ChargingHubs.SingleOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task PersistAsync(ChargingHub chargingHub)

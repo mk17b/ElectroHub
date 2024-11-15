@@ -2,6 +2,6 @@
 
 public interface IChargingHubRepository
 {
-    Task<ChargingHub> GetActiveAsync();
+    Task<ChargingHub?> GetByIdAsync(Guid id);
     Task PersistAsync(ChargingHub chargingHub);
 }
