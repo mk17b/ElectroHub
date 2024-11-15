@@ -10,20 +10,25 @@ public class ChargePointService(
 {
     public async Task<List<ChargePointReservationDto>> InvokeAsync(GetUserChargePointReservationsQuery query)
     {
+        var chargingHubId = await chargingHubRepository.GetChargingHubIdAsync(query.ChargingHubName);
         var chargePointReservations =
-            await chargePointReservationReadOnlyRepository.GetUserChargePointReservationsAsync(query.ChargingHubId, query.UserId);
+            await chargePointReservationReadOnlyRepository.GetUserChargePointReservationsAsync(chargingHubId,
+                query.UserId);
         return chargePointReservations;
     }
 
     public async Task<List<ChargePointReservationDto>> InvokeAsync(GetAvailableChargePointsByDateQuery query)
     {
-        var chargePoints = await chargePointReservationReadOnlyRepository.GetChargePointsByDateAsync(query.ChargingHubId, query.Date);
+        var chargingHubId = await chargingHubRepository.GetChargingHubIdAsync(query.ChargingHubName);
+        var chargePoints =
+            await chargePointReservationReadOnlyRepository.GetChargePointsByDateAsync(chargingHubId, query.Date);
         return chargePoints;
     }
 
     public async Task<ReservationStatus> InvokeAsync(CreateChargePointReservationCommand command)
     {
-        var chargingHub = await chargingHubRepository.GetByIdAsync(command.ChargingHubId);
+        var chargingHubId = await chargingHubRepository.GetChargingHubIdAsync(command.ChargingHubName);
+        var chargingHub = await chargingHubRepository.GetByIdAsync(chargingHubId);
         var result = chargingHub!.TryReserve(command.UserId, command.ReservationDate, command.SpotNumber);
 
         if (result.Flag == ReservationStatus.Success)

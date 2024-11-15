@@ -8,7 +8,8 @@ namespace ElectroHub.Infrastructure.Repositories;
 public class ChargePointReservationReadOnlyRepository(string connectionString)
     : ReadOnlyRepositoryBase(connectionString), IChargePointReservationReadOnlyRepository
 {
-    public async Task<List<ChargePointReservationDto>> GetUserChargePointReservationsAsync(Guid chargingHubId, Guid userId)
+    public async Task<List<ChargePointReservationDto>> GetUserChargePointReservationsAsync(Guid chargingHubId,
+        Guid userId)
     {
         var queryString = @"
         ;SELECT 
@@ -32,7 +33,7 @@ public class ChargePointReservationReadOnlyRepository(string connectionString)
 
         await using var db = new SqlConnection(ConnectionString);
         return (await db.QueryAsync<ChargePointReservationDto>(
-            queryString, 
+            queryString,
             new { UserId = userId, ChargingHubId = chargingHubId }
         )).ToList();
     }
@@ -60,9 +61,8 @@ public class ChargePointReservationReadOnlyRepository(string connectionString)
 
         await using var db = new SqlConnection(ConnectionString);
         return (await db.QueryAsync<ChargePointReservationDto>(
-            queryString, 
+            queryString,
             new { Date = date, ChargingHubId = chargingHubId }
         )).ToList();
     }
-
 }

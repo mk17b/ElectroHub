@@ -1,22 +1,22 @@
-﻿@page "/"
-@using global::ElectroHub.Application.ChargePoint
-@using global::ElectroHub.Domain.ChargePoint
-@using global::ElectroHub.Domain.Common.Enums
-@using global::ElectroHub.WebUI.Common.CommandsDto
-@using global::ElectroHub.WebUI.Common.Components
-@using global::ElectroHub.WebUI.Common.Services
-@using DialogParameters = global::ElectroHub.WebUI.Common.Components.DialogParameters
+﻿@page "/charging-hub/{ChargingHubName}"
+@using ElectroHub.Application.ChargePoint
+@using ElectroHub.Domain.ChargePoint
+@using ElectroHub.Domain.Common.Enums
+@using ElectroHub.WebUI.Common.CommandsDto
+@using ElectroHub.WebUI.Common.Components
+@using ElectroHub.WebUI.Common.Services
+@using DialogParameters = ElectroHub.WebUI.Common.Components.DialogParameters
 
 @inject IDialogService DialogService
 @inject ISnackbarService SnackbarService
 @inject ChargePointService ChargePointService
 
-<PageTitle>ElectroHub</PageTitle>
+<PageTitle>@ChargingHubName</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.Small">
     <MudPaper Elevation="3" Class="px-16 py-8">
         <MudStack Class="mb-4">
-            <MudText Typo="Typo.h4" GutterBottom="true" Style="font-weight: bold">ElectroHub</MudText>
+            <MudText Typo="Typo.h4" GutterBottom="true" Style="font-weight: bold">@ChargingHubName</MudText>
         </MudStack>
         <MudStack Class="mb-8">
             <MudText Typo="Typo.h6" GutterBottom="true" Style="font-weight: bold">My Reservations</MudText>
@@ -46,7 +46,8 @@
             <MudText Typo="Typo.h6" GutterBottom="true" Style="font-weight: bold">Available Charge Points</MudText>
             @if (AvailableReservations.Count == 0)
             {
-                <MudText Typo="Typo.body2" Style="font-size: 15px;">Looks like there are no available charging points at the 
+                <MudText Typo="Typo.body2" Style="font-size: 15px;">Looks like there are no available charging points at
+                    the
                     moment!
                 </MudText>
             }
@@ -73,9 +74,9 @@
 
 @code {
 
-    private Guid ChargingHubId { get; } = new("5a32e9e2-6034-4cb5-a31a-9cfe094476f5");
+    [Parameter] public string? ChargingHubName { get; set; }
+
     private Guid UserId { get; } = new("123e4567-e89b-12d3-a456-426614174000");
-    // private Guid UserId { get; } = new("c1b8f2e5-3a41-4ae5-9b8e-28d0b5946174");
     private DateTime? _date = DateTime.Today;
     private List<ChargePointReservationDto> UserReservations { get; set; } = new();
     private List<ChargePointReservationDto> AvailableReservations { get; set; } = new();
@@ -87,8 +88,8 @@
 
     private async Task LoadReservations()
     {
-        UserReservations = await ChargePointService.InvokeAsync(new GetUserChargePointReservationsQuery(ChargingHubId, UserId));
-        AvailableReservations = await ChargePointService.InvokeAsync(new GetAvailableChargePointsByDateQuery(ChargingHubId, _date));
+        UserReservations = await ChargePointService.InvokeAsync(new GetUserChargePointReservationsQuery(ChargingHubName!, UserId));
+        AvailableReservations = await ChargePointService.InvokeAsync(new GetAvailableChargePointsByDateQuery(ChargingHubName!, _date));
     }
 
     private async Task OnDateChanged(DateTime? newDate)
@@ -116,7 +117,7 @@
 
         if (!result!.Canceled)
         {
-            var command = new CreateChargePointReservationCommandDto { ChargingHubId = ChargingHubId, UserId = UserId, ReservationDate = chargePointReservation.ReservationDate, SpotNumber = chargePointReservation.SpotNumber }.ToCommand();
+            var command = new CreateChargePointReservationCommandDto { ChargingHubName = ChargingHubName, UserId = UserId, ReservationDate = chargePointReservation.ReservationDate, SpotNumber = chargePointReservation.SpotNumber }.ToCommand();
             var reservationResult = await ChargePointService.InvokeAsync(command);
 
             switch (reservationResult)

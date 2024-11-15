@@ -14,16 +14,23 @@ public class ChargingHubRepository(ElectroHubDbContext electroHubDbContext)
             .Where(x => x.IsActive)
             .Select(x => new ChargingHubDto
             {
-                ChargingHubId = x.Id,
                 Name = x.Name,
                 Address = x.Address
             })
             .ToListAsync();
     }
-    
-    public async Task<ChargingHub?> GetByIdAsync(Guid id)
+
+    public async Task<ChargingHub?> GetByIdAsync(Guid chargingHubId)
     {
-        return await ElectroHubDbContext.ChargingHubs.SingleOrDefaultAsync(x => x.Id == id);
+        return await ElectroHubDbContext.ChargingHubs.SingleOrDefaultAsync(x => x.Id == chargingHubId);
+    }
+
+    public async Task<Guid> GetChargingHubIdAsync(string chargingHubName)
+    {
+        return await ElectroHubDbContext.ChargingHubs
+            .Where(x => x.Name == chargingHubName)
+            .Select(x => x.Id)
+            .SingleOrDefaultAsync();
     }
 
     public async Task PersistAsync(ChargingHub chargingHub)

@@ -1,7 +1,7 @@
 ﻿namespace ElectroHub.Application.ChargePoint;
 
-public class GetUserChargePointReservationsQuery(Guid chargingHubId, Guid userId)
+public class GetUserChargePointReservationsQuery(string chargingHubName, Guid userId)
 {
-    public Guid ChargingHubId { get; init; } = chargingHubId;
+    public string ChargingHubName { get; init; } = chargingHubName;
     public Guid UserId { get; init; } = userId;
 }

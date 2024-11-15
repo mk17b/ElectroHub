@@ -1,7 +1,7 @@
 ﻿namespace ElectroHub.Application.ChargePoint;
 
-public class GetAvailableChargePointsByDateQuery(Guid chargingHubId, DateTime? date)
+public class GetAvailableChargePointsByDateQuery(string chargingHubName, DateTime? date)
 {
-    public Guid ChargingHubId { get; init; } = chargingHubId;
+    public string ChargingHubName { get; init; } = chargingHubName;
     public DateTime? Date { get; init; } = date;
 }

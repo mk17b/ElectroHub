@@ -1,5 +1,7 @@
-﻿@using global::ElectroHub.WebUI.Common.Configuration
+﻿@using ElectroHub.WebUI.Common.Configuration
 @inherits LayoutComponentBase
+
+@inject NavigationManager NavigationManager
 
 <MudThemeProvider Theme="_appTheme" IsDarkMode="@_isDarkMode"/>
 <MudPopoverProvider/>
@@ -8,6 +10,14 @@
 
 <MudLayout>
     <MudMainContent>
+        @if (!IsHomePage)
+        {
+            <MudText Typo="Typo.subtitle2" Color="Color.Secondary"
+                     Style="position: absolute; top: 16px; right: 128px; cursor: pointer;"
+                     @onclick="NavigateToDashboard">
+                Go Back
+            </MudText>
+        }
         <MudText Typo="Typo.subtitle2" Color="Color.Secondary"
                  Style="position: absolute; top: 16px; right: 24px; cursor: pointer;" @onclick="ToggleThemeMode">
             @(_isDarkMode ? "Light Mode" : "Dark Mode")
@@ -19,11 +29,17 @@
 @code {
 
     private readonly AppTheme _appTheme = new();
-    private bool _isDarkMode;
+    private bool IsHomePage => NavigationManager.Uri.EndsWith("/");
+    private bool _isDarkMode = true;
 
     private void ToggleThemeMode()
     {
         _isDarkMode = !_isDarkMode;
+    }
+
+    private void NavigateToDashboard()
+    {
+        NavigationManager.NavigateTo("/");
     }
 
 }

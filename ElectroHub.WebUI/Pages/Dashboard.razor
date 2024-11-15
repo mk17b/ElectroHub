@@ -1,5 +1,36 @@
-﻿<h3>Dashboard</h3>
+﻿@page "/"
+@using ElectroHub.Application.ChargingHub
+@using ElectroHub.Domain.ChargePoint
+
+@inject NavigationManager NavigationManager;
+@inject ChargingHubService ChargingHubService;
+
+<PageTitle>ElectroHub</PageTitle>
+
+@foreach (var chargingHub in ChargingHubs)
+{
+    <p>@chargingHub.Name</p>
+    <p>@chargingHub.Address</p>
+    <MudButton OnClick="() => NavigateTo(chargingHub.Name)"></MudButton>
+}
 
 @code {
-    
+
+    private List<ChargingHubDto> ChargingHubs { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadChargingHubs();
+    }
+
+    private async Task LoadChargingHubs()
+    {
+        ChargingHubs = await ChargingHubService.GetAllChargingHubsAsync();
+    }
+
+    public void NavigateTo(string name)
+    {
+        NavigationManager.NavigateTo($"/charging-hub/{name}");
+    }
+
 }
