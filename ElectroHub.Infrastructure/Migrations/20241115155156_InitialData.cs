@@ -8,7 +8,6 @@ namespace ElectroHub.Infrastructure.Migrations
     public partial class InitialData : Migration
     {
         private static readonly string SPLAU_ID = Guid.NewGuid().ToString();
-        private static readonly string FINESTRELLES_ID = Guid.NewGuid().ToString();
         private static readonly string CAMPNOU_ID = Guid.NewGuid().ToString();
         private static readonly string TORREAGBAR_ID = Guid.NewGuid().ToString();
         private static readonly string WBARCELONA_ID = Guid.NewGuid().ToString();
@@ -22,7 +21,6 @@ namespace ElectroHub.Infrastructure.Migrations
             INSERT INTO ChargingHubs (Id, Name, Address, IsActive) 
             VALUES 
                 ('{SPLAU_ID}', 'Centre Comercial Splau', 'Av. del Baix Llobregat', 1),
-                ('{FINESTRELLES_ID}', 'Centre Comercial Finestrelles', 'Carrer de Sant Mateu 9', 1),
                 ('{CAMPNOU_ID}', 'Spotify Camp Nou', 'Travessera de les Corts', 1),
                 ('{TORREAGBAR_ID}', 'Torre Agbar', 'Av. Diagonal 211', 1),
                 ('{WBARCELONA_ID}', 'W Barcelona', 'Pl. Rosa dels Vents 1', 1),
@@ -39,17 +37,6 @@ namespace ElectroHub.Infrastructure.Migrations
                 ('{Guid.NewGuid()}', 'C-006', '{SPLAU_ID}'),
                 ('{Guid.NewGuid()}', 'C-007', '{SPLAU_ID}'),
                 ('{Guid.NewGuid()}', 'C-008', '{SPLAU_ID}'),
-                
-                ('{Guid.NewGuid()}', 'C-001', '{FINESTRELLES_ID}'),
-                ('{Guid.NewGuid()}', 'C-002', '{FINESTRELLES_ID}'),
-                ('{Guid.NewGuid()}', 'C-003', '{FINESTRELLES_ID}'),
-                ('{Guid.NewGuid()}', 'C-004', '{FINESTRELLES_ID}'),
-                ('{Guid.NewGuid()}', 'C-005', '{FINESTRELLES_ID}'),
-                ('{Guid.NewGuid()}', 'C-006', '{FINESTRELLES_ID}'),
-                ('{Guid.NewGuid()}', 'C-007', '{FINESTRELLES_ID}'),
-                ('{Guid.NewGuid()}', 'C-008', '{FINESTRELLES_ID}'),
-                ('{Guid.NewGuid()}', 'C-009', '{FINESTRELLES_ID}'),
-                ('{Guid.NewGuid()}', 'C-010', '{FINESTRELLES_ID}'),
                 
                 ('{Guid.NewGuid()}', 'C-001', '{CAMPNOU_ID}'),
                 ('{Guid.NewGuid()}', 'C-002', '{CAMPNOU_ID}'),
@@ -100,8 +87,8 @@ namespace ElectroHub.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             var sqlScript = $@"
-            DELETE FROM ChargePoints WHERE ChargingHubId IN ('{SPLAU_ID}', '{FINESTRELLES_ID}', '{CAMPNOU_ID}', '{TORREAGBAR_ID}', '{WBARCELONA_ID}', '{ESTACIOSANTS_ID}', '{EROSKI_ID}');
-            DELETE FROM ChargingHubs WHERE Id IN ('{SPLAU_ID}', '{FINESTRELLES_ID}', '{CAMPNOU_ID}', '{TORREAGBAR_ID}', '{WBARCELONA_ID}', '{ESTACIOSANTS_ID}', '{EROSKI_ID}');
+            DELETE FROM ChargePoints WHERE ChargingHubId IN ('{SPLAU_ID}', '{CAMPNOU_ID}', '{TORREAGBAR_ID}', '{WBARCELONA_ID}', '{ESTACIOSANTS_ID}', '{EROSKI_ID}');
+            DELETE FROM ChargingHubs WHERE Id IN ('{SPLAU_ID}', '{CAMPNOU_ID}', '{TORREAGBAR_ID}', '{WBARCELONA_ID}', '{ESTACIOSANTS_ID}', '{EROSKI_ID}');
             ";
 
             migrationBuilder.Sql(sqlScript);

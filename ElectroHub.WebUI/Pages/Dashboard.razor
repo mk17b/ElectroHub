@@ -7,16 +7,48 @@
 
 <PageTitle>ElectroHub</PageTitle>
 
-@foreach (var chargingHub in ChargingHubs)
-{
-    <p>@chargingHub.Name</p>
-    <p>@chargingHub.Address</p>
-    <MudButton OnClick="() => NavigateTo(chargingHub.Name)"></MudButton>
-}
+<MudContainer MaxWidth="MaxWidth.ExtraLarge">
+    <MudPaper Elevation="3" Class="px-16 py-8">
+        <MudStack Class="mb-4">
+            <MudText Typo="Typo.h4" GutterBottom="true" Style="font-weight: bold">ElectroHub</MudText>
+        </MudStack>
+        <MudStack Class="mb-8">
+            <MudText Typo="Typo.h6" GutterBottom="true" Style="font-weight: bold">Available Charging Hubs</MudText>
+            @if (ChargingHubs.Count == 0)
+            {
+                <MudText Typo="Typo.body2" Style="font-size: 15px;">No charging hubs available :(</MudText>
+            }
+            <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+                @foreach (var chargingHub in ChargingHubs)
+                {
+                    <MudCard Elevation="2" Style="width: calc(33.333% - 16px);">
+                        <MudCardMedia Image="@GetImageUrl(chargingHub.Name)" Height="200" />
+                        <MudCardContent>
+                            <MudText Typo="Typo.body2" Style="font-size: 15px; font-weight: bold">@chargingHub.Name</MudText>
+                            <MudText Typo="Typo.body2" Style="color: #696969;">@chargingHub.Address</MudText>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="() => NavigateTo(chargingHub.Name)">Book</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                }
+            </div>
+        </MudStack>
+    </MudPaper>
+</MudContainer>
 
 @code {
 
     private List<ChargingHubDto> ChargingHubs { get; set; } = new();
+
+    private readonly Dictionary<string, string> _imageUrls = new()
+    {
+        { "Centre Comercial Splau", "https://static1.ara.cat/clip/42d222fb-984d-496d-a22f-0508a0f8aebd_16-9-aspect-ratio_default_0.jpg" },
+        { "Spotify Camp Nou", "https://monesport.cat/app/uploads/sites/12/2024/03/projecte-nou-5.jpg" },
+        { "Estació de Sants", "https://www.renfe.com/es/es/experiencias/estaciones-tren/_jcr_content/root/responsivegrid/rfslidercardsexperie_2104262906/rfcardexperience-3.coreimg.100.512.jpeg/1669722045119/c-sants.jpeg" },
+        { "W Barcelona", "https://www.barcelona-tourist-guide.com/images/int/attractions/beaches/L550/barcelona-beach-9086.jpg" },
+        { "Torre Agbar", "https://www.magradacatalunya.cat/wp-content/uploads/2020/10/Torre-Agbar-1.jpg" }
+    };
 
     protected override async Task OnInitializedAsync()
     {
@@ -28,9 +60,14 @@
         ChargingHubs = await ChargingHubService.GetAllChargingHubsAsync();
     }
 
+    private string GetImageUrl(string name)
+    {
+        return _imageUrls.TryGetValue(name, out var url) ? url : "https://user-images.githubusercontent.com/47315479/81145216-7fbd8700-8f7e-11ea-9d49-bd5fb4a888f1.png";
+    }
+
     public void NavigateTo(string name)
     {
-        NavigationManager.NavigateTo($"/charging-hub/{name}");
+        NavigationManager.NavigateTo($"/{name}");
     }
 
 }
