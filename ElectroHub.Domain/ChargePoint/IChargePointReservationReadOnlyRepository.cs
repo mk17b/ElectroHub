@@ -2,6 +2,6 @@
 
 public interface IChargePointReservationReadOnlyRepository
 {
-    Task<List<ChargePointReservationDto>> GetUserChargePointReservationsAsync(Guid userId);
-    Task<List<ChargePointReservationDto>> GetChargePointsByDateAsync(DateTime? reservationDate);
+    Task<List<ChargePointReservationDto>> GetUserChargePointReservationsAsync(Guid chargingHubId, Guid userId);
+    Task<List<ChargePointReservationDto>> GetChargePointsByDateAsync(Guid chargingHubId, DateTime? reservationDate);
 }

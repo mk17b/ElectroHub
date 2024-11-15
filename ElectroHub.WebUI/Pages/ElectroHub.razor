@@ -22,7 +22,7 @@
             <MudText Typo="Typo.h6" GutterBottom="true" Style="font-weight: bold">My Reservations</MudText>
             @if (UserReservations.Count == 0)
             {
-                <MudText Typo="Typo.body2" Style="font-size: 15px;">Looks like you haven’t reserved a charge point
+                <MudText Typo="Typo.body2" Style="font-size: 15px;">Looks like you haven’t reserved a charging point
                     yet!
                 </MudText>
             }
@@ -46,7 +46,7 @@
             <MudText Typo="Typo.h6" GutterBottom="true" Style="font-weight: bold">Available Charge Points</MudText>
             @if (AvailableReservations.Count == 0)
             {
-                <MudText Typo="Typo.body2" Style="font-size: 15px;">Looks like there are no available spots at the 
+                <MudText Typo="Typo.body2" Style="font-size: 15px;">Looks like there are no available charging points at the 
                     moment!
                 </MudText>
             }
@@ -87,8 +87,8 @@
 
     private async Task LoadReservations()
     {
-        UserReservations = await ChargePointService.InvokeAsync(new GetUserChargePointReservationsQuery(UserId));
-        AvailableReservations = await ChargePointService.InvokeAsync(new GetAvailableChargePointsByDateQuery(_date));
+        UserReservations = await ChargePointService.InvokeAsync(new GetUserChargePointReservationsQuery(ChargingHubId, UserId));
+        AvailableReservations = await ChargePointService.InvokeAsync(new GetAvailableChargePointsByDateQuery(ChargingHubId, _date));
     }
 
     private async Task OnDateChanged(DateTime? newDate)

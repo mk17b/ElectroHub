@@ -11,13 +11,13 @@ public class ChargePointService(
     public async Task<List<ChargePointReservationDto>> InvokeAsync(GetUserChargePointReservationsQuery query)
     {
         var chargePointReservations =
-            await chargePointReservationReadOnlyRepository.GetUserChargePointReservationsAsync(query.UserId);
+            await chargePointReservationReadOnlyRepository.GetUserChargePointReservationsAsync(query.ChargingHubId, query.UserId);
         return chargePointReservations;
     }
 
     public async Task<List<ChargePointReservationDto>> InvokeAsync(GetAvailableChargePointsByDateQuery query)
     {
-        var chargePoints = await chargePointReservationReadOnlyRepository.GetChargePointsByDateAsync(query.Date);
+        var chargePoints = await chargePointReservationReadOnlyRepository.GetChargePointsByDateAsync(query.ChargingHubId, query.Date);
         return chargePoints;
     }
 

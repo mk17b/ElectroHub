@@ -8,7 +8,7 @@ namespace ElectroHub.Infrastructure.Repositories;
 public class ChargePointReservationReadOnlyRepository(string connectionString)
     : ReadOnlyRepositoryBase(connectionString), IChargePointReservationReadOnlyRepository
 {
-    public async Task<List<ChargePointReservationDto>> GetUserChargePointReservationsAsync(Guid userId)
+    public async Task<List<ChargePointReservationDto>> GetUserChargePointReservationsAsync(Guid chargingHubId, Guid userId)
     {
         var queryString = @"
         ;SELECT 
@@ -20,18 +20,24 @@ public class ChargePointReservationReadOnlyRepository(string connectionString)
             [dbo].[ChargePointReservations] cr
         INNER JOIN 
             [dbo].[ChargePoints] c ON cr.ChargePointId = c.Id
+        INNER JOIN
+            [dbo].[ChargingHubs] ch ON c.ChargingHubId = ch.Id
         WHERE 
             cr.UserId = @UserId 
+            AND ch.Id = @ChargingHubId
             AND cr.ReservationDate >= CAST(GETDATE() AS DATE)
         ORDER BY 
             cr.ReservationDate ASC;
         ";
 
         await using var db = new SqlConnection(ConnectionString);
-        return (await db.QueryAsync<ChargePointReservationDto>(queryString, new { UserId = userId })).ToList();
+        return (await db.QueryAsync<ChargePointReservationDto>(
+            queryString, 
+            new { UserId = userId, ChargingHubId = chargingHubId }
+        )).ToList();
     }
 
-    public async Task<List<ChargePointReservationDto>> GetChargePointsByDateAsync(DateTime? date)
+    public async Task<List<ChargePointReservationDto>> GetChargePointsByDateAsync(Guid chargingHubId, DateTime? date)
     {
         var queryString = @"
         ;SELECT 
@@ -41,15 +47,22 @@ public class ChargePointReservationReadOnlyRepository(string connectionString)
             c.SpotNumber AS SpotNumber
         FROM 
             [dbo].[ChargePoints] c
+        INNER JOIN
+            [dbo].[ChargingHubs] ch ON c.ChargingHubId = ch.Id
         LEFT JOIN 
             [dbo].[ChargePointReservations] cr ON c.Id = cr.ChargePointId AND cr.ReservationDate = @Date
         WHERE 
-            cr.Id IS NULL
+            ch.Id = @ChargingHubId
+            AND cr.Id IS NULL
         ORDER BY 
             CAST(SUBSTRING(c.SpotNumber, CHARINDEX('-', c.SpotNumber) + 1, LEN(c.SpotNumber)) AS INT);
         ";
 
         await using var db = new SqlConnection(ConnectionString);
-        return (await db.QueryAsync<ChargePointReservationDto>(queryString, new { Date = date })).ToList();
+        return (await db.QueryAsync<ChargePointReservationDto>(
+            queryString, 
+            new { Date = date, ChargingHubId = chargingHubId }
+        )).ToList();
     }
+
 }
