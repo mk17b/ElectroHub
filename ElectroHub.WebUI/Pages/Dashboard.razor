@@ -22,13 +22,16 @@
                 @foreach (var chargingHub in ChargingHubs)
                 {
                     <MudCard Elevation="2" Style="width: calc(33.333% - 16px);">
-                        <MudCardMedia Image="@GetImageUrl(chargingHub.Name)" Height="200" />
+                        <MudCardMedia Image="@GetImageUrl(chargingHub.Name)" Height="200"/>
                         <MudCardContent>
-                            <MudText Typo="Typo.body2" Style="font-size: 15px; font-weight: bold">@chargingHub.Name</MudText>
+                            <MudText Typo="Typo.body2"
+                                     Style="font-size: 15px; font-weight: bold">@chargingHub.Name</MudText>
                             <MudText Typo="Typo.body2" Style="color: #696969;">@chargingHub.Address</MudText>
                         </MudCardContent>
                         <MudCardActions>
-                            <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="() => NavigateTo(chargingHub.Name)">Book</MudButton>
+                            <MudButton Variant="Variant.Text" Color="Color.Primary"
+                                       OnClick="() => NavigateTo(chargingHub.Name)">Book
+                            </MudButton>
                         </MudCardActions>
                     </MudCard>
                 }
