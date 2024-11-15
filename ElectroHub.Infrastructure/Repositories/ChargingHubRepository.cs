@@ -17,6 +17,7 @@ public class ChargingHubRepository(ElectroHubDbContext electroHubDbContext)
                 Name = x.Name,
                 Address = x.Address
             })
+            .OrderBy(x => x.Name)
             .ToListAsync();
     }
 
